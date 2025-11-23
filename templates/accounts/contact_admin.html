@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block title %}Contact Admin - Placement System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white text-center py-3">
+                <h3 class="mb-0"><i class="fas fa-envelope me-2"></i>Contact Placement Admin</h3>
+                <p class="mb-0 mt-1">Get in touch with the placement officer</p>
+            </div>
+            <div class="card-body p-4">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            <i class="fas fa-{% if message.tags == 'success' %}check-circle{% else %}exclamation-triangle{% endif %} me-2"></i>
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <!-- Contact Information -->
+                <div class="card mb-4 border-warning">
+                    <div class="card-body">
+                        <h5 class="text-warning mb-3">
+                            <i class="fas fa-info-circle me-2"></i>Contact Information
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p class="mb-2">
+                                    <i class="fas fa-user-tie me-2 text-primary"></i>
+                                    <strong>Placement Officer</strong>
+                                </p>
+                                <p class="mb-2">
+                                    <i class="fas fa-envelope me-2 text-success"></i>
+                                    sagarmpamalli@gmail.com
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-2">
+                                    <i class="fas fa-phone me-2 text-info"></i>
+                                    +91 XXXXXXXXXX
+                                </p>
+                                <p class="mb-2">
+                                    <i class="fas fa-clock me-2 text-warning"></i>
+                                    Mon-Fri: 9:00 AM - 5:00 PM
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Your Name *</label>
+                            <input type="text" name="name" class="form-control" required 
+                                   value="{% if user.is_authenticated %}{{ user.get_full_name }}{% endif %}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Your Email *</label>
+                            <input type="email" name="email" class="form-control" required
+                                   value="{% if user.is_authenticated %}{{ user.email }}{% endif %}">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">User Type *</label>
+                            <select name="user_type" class="form-select" required>
+                                <option value="">Select User Type</option>
+                                <option value="student" {% if user.user_type == 'student' %}selected{% endif %}>Student</option>
+                                <option value="company" {% if user.user_type == 'company' %}selected{% endif %}>Company</option>
+                                <option value="guest">Guest</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Subject *</label>
+                            <select name="subject" class="form-select" required>
+                                <option value="">Select Subject</option>
+                                <option value="Technical Issue">Technical Issue</option>
+                                <option value="Account Problem">Account Problem</option>
+                                <option value="Job Posting Help">Job Posting Help</option>
+                                <option value="Application Issue">Application Issue</option>
+                                <option value="General Inquiry">General Inquiry</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Your Message *</label>
+                        <textarea name="message" class="form-control" rows="5" 
+                                  placeholder="Please describe your issue or inquiry in detail..." required></textarea>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-paper-plane me-2"></i>Send Message to Admin
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer text-center py-3">
+                <small class="text-muted">
+                    <i class="fas fa-clock me-1"></i>
+                    We typically respond within 24 hours
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    border: none;
+    border-radius: 15px;
+}
+
+.form-control, .form-select {
+    border-radius: 10px;
+    padding: 10px 15px;
+}
+
+.btn {
+    border-radius: 10px;
+    padding: 12px;
+}
+</style>
+{% endblock %}

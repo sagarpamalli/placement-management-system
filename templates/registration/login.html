@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - Placement System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white text-center py-3">
+                <h3 class="mb-0"><i class="fas fa-sign-in-alt me-2"></i>Login</h3>
+                <p class="mb-0 mt-1">Access your Placement System account</p>
+            </div>
+            <div class="card-body p-4">
+                {% if form.errors %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Your username and password didn't match. Please try again.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endif %}
+
+                {% if next %}
+                    {% if user.is_authenticated %}
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        Your account doesn't have access to this page. Please login with an account that has access.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info alert-dismissible fade show" role="alert">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Please login to access this page.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    {% endif %}
+                {% endif %}
+
+                <form method="post" action="{% url 'login' %}">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="id_username" class="form-label">
+                            <i class="fas fa-user me-2"></i>Username
+                        </label>
+                        <input type="text" name="username" class="form-control form-control-lg" 
+                               id="id_username" placeholder="Enter your username" required autofocus>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="id_password" class="form-label">
+                            <i class="fas fa-lock me-2"></i>Password
+                        </label>
+                        <input type="password" name="password" class="form-control form-control-lg" 
+                               id="id_password" placeholder="Enter your password" required>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-sign-in-alt me-2"></i>Login
+                        </button>
+                    </div>
+
+                    <input type="hidden" name="next" value="{{ next }}">
+                </form>
+
+                <div class="text-center mt-3">
+                    <a href="#" class="text-decoration-none">Forgot your password?</a>
+                </div>
+
+                <hr class="my-4">
+
+                <!-- Registration Options -->
+                <div class="text-center">
+                    <h6 class="text-muted mb-3">Don't have an account?</h6>
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'student_register' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-user-graduate me-2"></i>Register as Student
+                        </a>
+                        <a href="{% url 'company_register' %}" class="btn btn-outline-success">
+                            <i class="fas fa-building me-2"></i>Register as Company
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer text-center py-3">
+                <small class="text-muted">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Contact administrator if you face any login issues
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    border: none;
+    border-radius: 15px;
+}
+
+.form-control {
+    border-radius: 10px;
+    padding: 12px 15px;
+}
+
+.btn {
+    border-radius: 10px;
+    padding: 12px;
+}
+
+.alert {
+    border-radius: 10px;
+    border: none;
+}
+</style>
+{% endblock %}

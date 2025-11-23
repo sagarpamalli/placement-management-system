@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Placement Management System{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .navbar-brand {
+            font-weight: bold;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 20px 0;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'index' %}">
+                <i class="fas fa-briefcase"></i> Placement System
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'index' %}">Home</a>
+                    </li>
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'contact_admin' %}">
+                                <i class="fas fa-headset me-1"></i>Contact Admin
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+                
+                <ul class="navbar-nav">
+                    {% if user.is_authenticated %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user"></i> {{ user.username }}
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><span class="dropdown-item-text">
+                                    <small>{{ user.get_user_type_display }}</small>
+                                </span></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <!-- In the navbar section of base.html, replace the logout dropdown item with: -->
+                    <li class="nav-item">
+                        <a class="nav-link text-warning" href="{% url 'logout' %}">
+                            <i class="fas fa-sign-out-alt me-1"></i>Logout ({{ user.username }})
+                        </a>
+                    </li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="registerDropdown" role="button" data-bs-toggle="dropdown">
+                                Register
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'student_register' %}">As Student</a></li>
+                                <li><a class="dropdown-item" href="{% url 'company_register' %}">As Company</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'login' %}">Login</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        <div class="container mt-4">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            {% block content %}
+            {% endblock %}
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer class="footer mt-5 bg-dark text-light">
+    <div class="container">
+        <div class="row py-4">
+            <div class="col-md-4">
+                <h6 class="text-warning">Placement Cell</h6>
+                <p class="mb-2 small">
+                    <i class="fas fa-university me-2"></i>KLE Institute Of Technology Hubballi
+                </p>
+                <p class="mb-2 small">
+                    <i class="fas fa-map-marker-alt me-2"></i>Hubballi-Dharwad,Karnataka 
+                </p>
+                <p class="mb-2 small">
+                    <i class="fas fa-phone me-2"></i>+91 XXXXXXXXXX
+                </p>
+            </div>
+            <div class="col-md-4">
+                <h6 class="text-warning">Admin Contact</h6>
+                <p class="mb-2 small">
+                    <i class="fas fa-user-tie me-2"></i>Placement Officer
+                </p>
+                <p class="mb-2 small">
+                    <i class="fas fa-envelope me-2"></i>sagarmpamalli@gmail.com
+                </p>
+                <p class="mb-2 small">
+                    <i class="fas fa-phone me-2"></i>+91 XXXXXXXXXX
+                </p>
+            </div>
+            <div class="col-md-4 text-center text-md-end">
+                <div class="credit-badge d-inline-block">
+                    <i class="fas fa-code me-1"></i>
+                    Crafted by 
+                    <strong class="text-warning">Sagar Pamalli</strong>
+                    <i class="fas fa-heart text-danger ms-1"></i>
+                </div>
+                <p class="mt-2 mb-0 small">
+                    &copy; 2025 Placement Management System
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    {% block extra_scripts %}
+    {% endblock %}
+</body>
+</html>

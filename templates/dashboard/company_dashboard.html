@@ -1,0 +1,197 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% block dashboard_content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3>Company Dashboard</h3>
+    <span class="badge bg-success">{{ user.user_type|title }}</span>
+    <div>
+        <span class="badge bg-success fs-6 me-3">{{ user.get_user_type_display }}</span>
+        <a href="{% url 'logout' %}" class="btn btn-outline-danger btn-sm">
+            <i class="fas fa-sign-out-alt me-1"></i> Logout
+        </a>
+    </div>
+    <!-- In company_dashboard.html, add this small button -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <!-- Your existing header content -->
+        <div>
+            <a href="{% url 'contact_admin' %}" class="btn btn-outline-info btn-sm">
+                <i class="fas fa-question-circle me-1"></i> Help
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <!-- Company Profile -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5><i class="fas fa-building"></i> Company Profile</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <table class="table table-borderless">
+                            <tr>
+                                <th>Company Name:</th>
+                                <td>{{ company.company_name }}</td>
+                            </tr>
+                            <tr>
+                                <th>Contact Person:</th>
+                                <td>{{ company.contact_person }}</td>
+                            </tr>
+                            <tr>
+                                <th>Email:</th>
+                                <td>{{ company.contact_email }}</td>
+                            </tr>
+                            <tr>
+                                <th>Phone:</th>
+                                <td>{{ company.user.phone }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <table class="table table-borderless">
+                            <tr>
+                                <th>Website:</th>
+                                <td>
+                                    {% if company.website %}
+                                        <a href="{{ company.website }}" target="_blank">{{ company.website }}</a>
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Address:</th>
+                                <td>{{ company.address|default:"N/A" }}</td>
+                            </tr>
+                            <tr>
+                                <th>Description:</th>
+                                <td>{{ company.description|default:"N/A" }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Post New Job -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5><i class="fas fa-plus-circle"></i> Post New Job</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        {% for field in form %}
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">{{ field.label }}</label>
+                                {{ field }}
+                                {% if field.errors %}
+                                    <div class="text-danger small">{{ field.errors }}</div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-paper-plane"></i> Post Job
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Posted Jobs -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5><i class="fas fa-list"></i> Posted Jobs ({{ jobs.count }})</h5>
+            </div>
+            <div class="card-body">
+                {% for job in jobs %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <h5 class="card-title">{{ job.title }}</h5>
+                                    <p class="card-text">{{ job.description|truncatewords:20 }}</p>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <small><i class="fas fa-map-marker-alt"></i> {{ job.location }}</small>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <small><i class="fas fa-money-bill-wave"></i> {{ job.salary }}</small>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <small><i class="fas fa-clock"></i> {{ job.application_deadline }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 text-end">
+                                    <span class="badge bg-{% if job.is_active %}success{% else %}secondary{% endif %} mb-2">
+                                        {{ job.is_active|yesno:"Active,Inactive" }}
+                                    </span>
+                                    <br>
+                                    <small class="text-muted">Posted: {{ job.posted_date|date:"M d, Y" }}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="text-muted">No jobs posted yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Job Applications -->
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-users"></i> Job Applications ({{ applications.count }})</h5>
+            </div>
+            <div class="card-body">
+                {% for application in applications %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <h6>{{ application.job.title }}</h6>
+                                    <p class="mb-1"><strong>Student:</strong> {{ application.student.user.get_full_name }}</p>
+                                    <p class="mb-1"><strong>Enrollment:</strong> {{ application.student.enrollment_number }}</p>
+                                    <p class="mb-1"><strong>Department:</strong> {{ application.student.department }}</p>
+                                    <p class="mb-1"><strong>CGPA:</strong> {{ application.student.cgpa }}</p>
+                                    <p class="mb-1"><strong>Skills:</strong> {{ application.student.skills|truncatewords:10 }}</p>
+                                    <small class="text-muted">Applied: {{ application.applied_date|date:"M d, Y H:i" }}</small>
+                                </div>
+                                <div class="col-md-4 text-end">
+                                    <span class="badge bg-{% if application.status == 'applied' %}primary{% elif application.status == 'accepted' %}success{% elif application.status == 'rejected' %}danger{% else %}warning{% endif %} mb-2">
+                                        {{ application.status|title }}
+                                    </span>
+                                    <br>
+                                    {% if application.student.resume %}
+                                        <a href="{{ application.student.resume.url }}" class="btn btn-outline-primary btn-sm" target="_blank">
+                                            <i class="fas fa-download"></i> View Resume
+                                        </a>
+                                    {% else %}
+                                        <span class="text-danger small">No Resume</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="text-muted">No applications received yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    input, textarea, select {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+</style>
+{% endblock %}

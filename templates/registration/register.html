@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Registration Successful - Placement System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow text-center">
+            <div class="card-body p-5">
+                <div class="mb-4">
+                    <i class="fas fa-check-circle fa-5x text-success"></i>
+                </div>
+                <h2 class="text-success mb-3">Registration Successful!</h2>
+                <p class="lead mb-4">
+                    Your account has been created successfully. You can now login to your account 
+                    and start using the Placement Management System.
+                </p>
+                <div class="d-grid gap-2 col-md-8 mx-auto">
+                    <a href="{% url 'login' %}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-sign-in-alt me-2"></i>Login to Your Account
+                    </a>
+                    <a href="{% url 'index' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-home me-2"></i>Back to Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

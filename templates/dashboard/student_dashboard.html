@@ -1,0 +1,199 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% block dashboard_content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3>Student Dashboard</h3>
+    <span class="badge bg-primary">{{ user.user_type|title }}</span>
+     <p class="text-muted mb-0">Welcome back, {{ student.user.get_full_name }}</p>
+    <div>
+        <span class="badge bg-primary fs-6 me-3">{{ user.get_user_type_display }}</span>
+        <a href="{% url 'logout' %}" class="btn btn-outline-danger btn-sm">
+            <i class="fas fa-sign-out-alt me-1"></i> Logout
+        </a>
+    </div>
+    <!-- In student_dashboard.html, add this small button -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+    <!-- Your existing header content -->
+    <div>
+        <a href="{% url 'contact_admin' %}" class="btn btn-outline-info btn-sm">
+            <i class="fas fa-question-circle me-1"></i> Help
+        </a>
+    </div>
+</div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <!-- Profile Card -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5><i class="fas fa-user-circle"></i> My Profile</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <table class="table table-borderless">
+                            <tr>
+                                <th>Name:</th>
+                                <td>{{ student.user.get_full_name }}</td>
+                            </tr>
+                            <tr>
+                                <th>Enrollment:</th>
+                                <td>{{ student.enrollment_number }}</td>
+                            </tr>
+                            <tr>
+                                <th>Department:</th>
+                                <td>{{ student.department }}</td>
+                            </tr>
+                            <tr>
+                                <th>Semester:</th>
+                                <td>{{ student.semester }}</td>
+                            </tr>
+                            <tr>
+                                <th>CGPA:</th>
+                                <td>{{ student.cgpa }}</td>
+                            </tr>
+                            <tr>
+                                <th>Skills:</th>
+                                <td>{{ student.skills|default:"Not specified" }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <h6>Resume Status</h6>
+                                {% if student.resume %}
+                                    <i class="fas fa-file-pdf text-success fa-3x mb-3"></i>
+                                    <p class="text-success">Resume Uploaded</p>
+                                    <a href="{{ student.resume.url }}" class="btn btn-success btn-sm" target="_blank">
+                                        <i class="fas fa-download"></i> Download
+                                    </a>
+                                {% else %}
+                                    <i class="fas fa-file-excel text-warning fa-3x mb-3"></i>
+                                    <p class="text-warning">No Resume</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Resume Upload Form -->
+                <div class="mt-4">
+                    <h6>Upload/Update Resume</h6>
+                    <form method="post" enctype="multipart/form-data" class="row g-3 align-items-end">
+                        {% csrf_token %}
+                        <div class="col-md-8">
+                            <input type="file" name="resume" class="form-control" accept=".pdf,.doc,.docx" required>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-upload"></i> Upload Resume
+                            </button>
+                        </div>
+                    </form>
+                    <small class="text-muted">Accepted formats: PDF, DOC, DOCX</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Available Jobs -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5><i class="fas fa-briefcase"></i> Available Jobs</h5>
+                <span class="badge bg-info">{{ jobs.count }} jobs available</span>
+            </div>
+            <div class="card-body">
+                {% for job in jobs %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <h5 class="card-title">{{ job.title }}</h5>
+                                    <h6 class="card-subtitle mb-2 text-muted">
+                                        <i class="fas fa-building"></i> {{ job.company.company_name }}
+                                    </h6>
+                                    <p class="card-text">{{ job.description|truncatewords:30 }}</p>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <small><i class="fas fa-map-marker-alt"></i> {{ job.location }}</small>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <small><i class="fas fa-money-bill-wave"></i> {{ job.salary }}</small>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <small><i class="fas fa-clock"></i> Apply by: {{ job.application_deadline }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 text-end">
+                                    {% if job.id in applied_job_ids %}
+                                        <span class="badge bg-success mb-2">Applied</span>
+                                    {% elif student.resume %}
+                                        <a href="{% url 'apply_job' job.id %}" class="btn btn-primary btn-sm mb-2">
+                                            Apply Now
+                                        </a>
+                                    {% else %}
+                                        <span class="text-danger">Upload resume to apply</span>
+                                    {% endif %}
+                                    <br>
+                                    <a href="#" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#jobModal{{ job.id }}">
+                                        View Details
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Job Details Modal -->
+                    <div class="modal fade" id="jobModal{{ job.id }}" tabindex="-1">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">{{ job.title }}</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <h6>Company: {{ job.company.company_name }}</h6>
+                                    <p><strong>Description:</strong><br>{{ job.description }}</p>
+                                    <p><strong>Requirements:</strong><br>{{ job.requirements }}</p>
+                                    <p><strong>Location:</strong> {{ job.location }}</p>
+                                    <p><strong>Salary:</strong> {{ job.salary }}</p>
+                                    <p><strong>Job Type:</strong> {{ job.get_job_type_display }}</p>
+                                    <p><strong>Application Deadline:</strong> {{ job.application_deadline }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="text-muted">No jobs available at the moment.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- My Applications -->
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-file-alt"></i> My Applications ({{ applications.count }})</h5>
+            </div>
+            <div class="card-body">
+                {% for application in applications %}
+                    <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
+                        <div>
+                            <h6>{{ application.job.title }}</h6>
+                            <small class="text-muted">{{ application.job.company.company_name }}</small>
+                            <br>
+                            <small class="text-muted">Applied: {{ application.applied_date|date:"M d, Y" }}</small>
+                        </div>
+                        <span class="badge bg-{% if application.status == 'applied' %}primary{% elif application.status == 'accepted' %}success{% elif application.status == 'rejected' %}danger{% else %}warning{% endif %}">
+                            {{ application.status|title }}
+                        </span>
+                    </div>
+                {% empty %}
+                    <p class="text-muted">You haven't applied to any jobs yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
